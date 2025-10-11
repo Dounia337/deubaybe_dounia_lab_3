@@ -1,0 +1,237 @@
+<!DOCTYPE html> 
+<html lang="en">
+    <title>FI Dashboard</title>
+    <head>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Alegreya">
+        <style>  
+            
+            body {
+                background-image: url(1.jpg);
+                background-size: cover;
+                font-family:alegreya ;
+                background-color: #f4f4f4; 
+                width: 100%;
+            }
+            .dashboard-container {
+                
+                width: 94%;           
+                margin: 0px; 
+                margin-bottom: auto;    
+                padding: 40px;           
+                background-color: #e9e3e3;
+                opacity: 0.75;           
+    
+              }
+              .user{
+                text-align: left;
+                padding-top: 10px;
+                padding-left: 10px;
+                padding-bottom: 8px;
+                color: rgb(187, 41, 41); 
+                border-radius: 10px;
+                align-items: center;
+                background-color: #d1cbcb;
+                opacity: 0.85;
+                width : 300px;
+              }
+
+            .values {
+                font-family:  sans-serif;
+                color: #555;
+                padding: 40px;
+                margin: 40px;
+                max-width: 1000px;
+                
+            }
+            .list{
+                padding-left: 50px;
+            }
+            .cards{
+                display: flex;
+                gap: 30px;
+                flex-wrap: wrap;
+            }
+            .card{
+                font-weight: bold;
+                color :rgb(187, 41, 41);
+                background-color: #d1cbcb;
+                text-align:  center;
+                border-radius: 10px;        
+                padding: 10px;
+                margin: 10px;
+                width: 250px;
+                box-shadow: 4px 4px 8px rgba(136, 115, 115, 0.1);
+                opacity: 0.85;
+            }
+            .session{
+                width: 70%;           
+                margin: 0px; 
+                margin-bottom: auto;    
+                padding: 40px;           
+                background-color: #e9e3e3;
+                opacity: 0.75;   
+                font-weight: bold;        
+    
+            }
+            h3 {
+                padding-left: 20px;
+                border-radius: 10px;
+                width: 140px;
+                background-color: antiquewhite;
+                padding-left: 20px;
+                color: #0f0e0e  ;
+                font-size: 150%;
+            }
+            ul {
+                padding-left: 20px;
+            }
+            a {
+                color: #0066cc;
+            }
+    
+            li {
+                margin-bottom: 8px;
+            }
+
+            table {
+                width : 77%;
+                margin-top: 20px;
+                background-color: #d1cbcb;
+                border-collapse: collapse; 
+                opacity: 0.85;
+                }
+
+            th, td {
+                text-align: justify;
+                padding-left: 20px;
+                padding-bottom: 16px;
+                padding-top: 16px;
+                padding-right: 100px;
+            }
+        </style>
+        
+        <meta charset="UTF-8">
+       <body>
+         <p> <span style ="float: right; border: 1px solid; z-index: 9999; position:relative; background-color: #f6f4f4;"> <a href="log-in.html">Log-out</a></span></p>
+        <div class =" dashboard-container"> 
+            <div class ="user"> 
+                <img src="user.png" style="width:40px; height:40px;">
+                <P><h4>Faculty-Intern Dashboard </h4> </P> 
+                <p><h4>Deubaybe Dounia </h4></p>
+                <p><h5>ID: 30392027</h5></p>
+            </div>
+           
+    </div>
+       
+        <div class="list"> 
+            <p> <h3> Course List</h3></p>
+
+        <div class="cards"> 
+
+            <div class="card">
+
+                <img src="icon1.png" style="width:40px; height:40px;">
+                <h4> Web Technologies </h4>
+                <p><h4> 1st Semester fall</h4></p>
+                <p><h5> Cohort A</h5></p>
+            </div>
+
+            <div class="card">
+
+                <img src="icon1.png" style="width:40px; height:40px;">
+                <h4>  Data Structures </h4> 
+                <p><h4> 1st Semester fall</h4></p>
+                <p><h5> Cohort A</h5></p>
+                
+            </div>
+            <div class="card"> 
+                <img src="icon1.png" style="width:40px; height:40px;">
+                <h4>  Intermediate Programming </h4> 
+                <p><h4> 1st Semester fall</h4></p>
+                <p><h5> Cohort A</h5></p>
+            </div>
+
+        </div>  
+
+        </div>
+
+        
+        <div class="list" > 
+            <p> <h3> Sessions</h3></p>
+
+            <div class="session"> 
+                <h4> Attendance Session</h4> 
+                <p> Course: Web Technologies </p>
+                <p> Date: 10/10/2025 </p>
+            </div>
+
+            <div > 
+                <table>
+                    <tr>
+                        <th style="color: rgb(172, 80, 80);"> Student Name </th>
+                        <th style="color: rgb(172, 80, 80);"> Student ID </th>
+                        <th style="color: rgb(172, 80, 80);"> Status </th>
+                         <th style="color: rgb(172, 80, 80);"> Time Marked </th>
+                    </tr>
+                    <tr>
+                        <td> Deubaybe Dounia </td>
+                        <td> 30392027 </td>
+                        <td> Present </td>
+                        <td> 9:00 am</td>
+                    </tr>
+                    <tr>
+                        <td> Jesus Matamoros </td>
+                        <td> 30392028 </td>
+                        <td> Absent </td>
+                        <td> -- am</td>
+                    </tr>
+                    <tr>
+                        <td> Albert Kindo </td>
+                        <td> 30392029 </td>
+                        <td> Present </td>
+                        <td> 9:05 am</td>
+                    </tr>
+                    <tr>
+                        <td> Michael Johnson </td>
+                        <td> 30392030 </td>
+                        <td> Present </td>
+                        <td> 9:02 am</td>
+                    </tr>
+                    <tr>
+                        <td> Leonardo Montalvo </td>
+                        <td> 30392031 </td>
+                        <td> Absent </td>
+                        <td> -- am</td>
+                    </tr>
+                </table>
+            </div>
+
+        </div>
+
+         <div class="list" > 
+            <p> <h3> Reports</h3></p>
+            <div>
+            <p><h4> Attendace Reports</h4></p>
+            <table>
+                <tr>
+                        <th style="color: rgb(172, 80, 80);"> Total Students </th>
+                        <th style="color: rgb(172, 80, 80);"> Present </th>
+                        <th style="color: rgb(172, 80, 80);"> Absent</th>
+                         <th style="color: rgb(172, 80, 80);"> Late</th>
+                    </tr>
+                    <tr>
+                        <td> 30 </td>
+                        <td> 25 </td>
+                        <td> 5 </td>
+                        <td> 3 </td>
+
+            </table>
+
+            </div>
+
+
+        </div>
+    
+       </body>
+    
+</html>

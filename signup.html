@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+
+    <head>  
+         <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Alegreya">
+        <style> 
+            body {
+                font-family: alegreya;
+                background-image: url('2.jpg');
+                page-orientation: landscape;
+                background-repeat: no-repeat;
+                background-size: cover;
+
+            }
+            
+            form {
+               
+                margin: 0 auto;
+                padding: 20px;
+                border: 1px solid #ccc;
+                border-radius: 10px;
+                max-width: 600px;
+                background-color: #ece8e8;
+                opacity: 0.75;
+            }
+            .singin{
+            
+                margin-top: 15%;
+                text-align: center;
+                color: rgb(141, 8, 30);
+                font-size: 20px;
+                font-family: Arial, sans-serif;
+                padding : 40px;
+                max-width: 1500px;
+
+            }
+
+        </style>
+         <title>
+        
+        Attendance tracker
+    </title> 
+</head>
+    <body>
+        
+        <div class ="singin">  <p> <h4> <span > <a href="log-in.html"> Login </a></span>or <span> <a href="#">Sign up </a></span> ? </h4></p></div>
+
+     <form>
+        <label for="fname">First Name</label>
+        <input type="text"  required> 
+
+        <label for="lname">Last Name</label>
+        <input type="text"  required style="margin-left: 20px;"><br> <br>
+
+        <label for="email">Email Adress:</label> 
+        <input type="text" required>
+
+        <label for="role">Role:</label> 
+        <select  name ="role " style=" margin-left: 20px;" required>
+            <option > -- Select Role -- </option>
+            <option value="student">Student</option>
+            <option value="teacher">Faculty</option>
+            <option value="fI">Faculty Intern</option>
+
+        </select> <br><br>
+
+        <label for="password">Password:</label>
+        <input type="password" required><br><br>
+
+        <label for="confirm">Confirm password:</label>
+        <input type="password" required><br><br>
+
+        <input type="submit" value="Log In">
+     </form>
+    </body>
+    
+</html>
