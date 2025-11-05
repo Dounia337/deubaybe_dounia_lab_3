@@ -46,13 +46,16 @@
 
      <form>
         <label for="fname">First Name</label>
-        <input type="text"  required> 
+        <input type="text" id ="fname" required
+         title="Name must start with a letter and can contain letters, numbers, spaces or underscores only.">> 
 
         <label for="lname">Last Name</label>
-        <input type="text"  required style="margin-left: 20px;"><br> <br>
+        <input type="text" id ="lname"  required style="margin-left: 20px;" 
+         title="Last Name must start with a letter and can contain letters, numbers, spaces or underscores only.">><br> <br>
 
         <label for="email">Email Adress:</label> 
-        <input type="text" required>
+        <input type="text" id="email" required 
+         title="Enter a valid email address.">
 
         <label for="role">Role:</label> 
         <select  name ="role " style=" margin-left: 20px;" required>
@@ -64,13 +67,60 @@
         </select> <br><br>
 
         <label for="password">Password:</label>
-        <input type="password" required><br><br>
+        <input type="password" id="password" required 
+         title="Password must contain at least one number, one uppercase, one lowercase letter, and be at least 8 characters long."><br><br>
 
         <label for="confirm">Confirm password:</label>
-        <input type="password" required><br><br>
+        <input type="password" id="confirm" required 
+         title="Password must contain at least one number, one uppercase, one lowercase letter, and be at least 8 characters long."><br><br>
 
         <input type="submit" value="Sign Up">
      </form>
     </body>
+    <script>
+    const form = document.querySelector("form");
+
+    form.addEventListener("submit", function(event) {
+        const firstName = document.getElementById("fname");
+        const lastName = document.getElementById("lname");
+        const email = document.getElementById("email");
+        const password = document.getElementById("password");
+        const confirmPassword = document.getElementById("confirm");
+
+        const namePattern = /^[A-Za-z][A-Za-z0-9_ ]*$/;
+        const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-z]{2,}$/;
+        const passwordPattern = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
+
+        if (!namePattern.test(firstName.value)) {
+        alert("Invalid First Name.");
+        event.preventDefault();
+        return;
+        }
+
+        if (!namePattern.test(lastName.value)) {
+        alert("Invalid Last Name.");
+        event.preventDefault();
+        return;
+        }
+
+        if (!emailPattern.test(email.value)) {
+        alert("Please enter a valid email address.");
+        event.preventDefault();
+        return;
+        }
+
+        if (!passwordPattern.test(password.value)) {
+        alert("Password must contain one uppercase, one lowercase, one number, and be at least 8 characters long.");
+        event.preventDefault();
+        return;
+        }
+
+        if (password.value !== confirmPassword.value) {
+        alert("Passwords do not match.");
+        event.preventDefault();
+        return;
+        }
+    });
+</script>
     
 </html>
