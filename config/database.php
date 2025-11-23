@@ -3,7 +3,7 @@
 $server = "localhost";
 $user = "deubaybe.dounia";
 $password = "Dou81387";
-$database = "webtech_2025A_deubaybe.dounia";
+$database = "webtech_2025A_deubaybe_dounia";
 $port = 3306;
 
 // Create a connection
