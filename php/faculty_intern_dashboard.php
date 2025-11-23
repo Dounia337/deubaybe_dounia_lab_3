@@ -38,7 +38,12 @@ if ($current_session) {
 }
 
 // Calculate attendance statistics
-$stats = ['total_students' => 0, 'present' => 0, 'absent' => 0, 'late' => 0];
+$stats = [];
+$stats['total_students'] = 0;
+$stats['present'] = 0;
+$stats['absent'] = 0;
+$stats['late'] = 0;
+
 if ($current_session) {
     $session_id = $current_session['id'];
     $stats_query = "SELECT 

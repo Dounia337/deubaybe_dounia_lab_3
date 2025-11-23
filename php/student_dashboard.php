@@ -53,7 +53,12 @@ $stats_result = $connection->query($attendance_stats_query);
 $stats = $stats_result->fetch_assoc();
 
 // Calculate grade (simple percentage)
-$grade = $stats['total_sessions'] > 0 ? round(($stats['attended'] / $stats['total_sessions']) * 100, 2) : 0;
+$grade = 0;
+if ($stats['total_sessions'] > 0) {
+    $grade = round(($stats['attended'] / $stats['total_sessions']) * 100, 2);
+}
+
+
 ?>
 
 <!DOCTYPE html> 
