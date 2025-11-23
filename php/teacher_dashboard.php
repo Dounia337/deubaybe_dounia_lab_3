@@ -206,8 +206,7 @@ if ($current_session) {
         </div>
     </div>
 
-    <script src="../js/teacher.js">
-    </script>
+    <script src="../js/teacher.js"> </script>
 </body>
 </html>
 <?php $connection->close(); ?>
