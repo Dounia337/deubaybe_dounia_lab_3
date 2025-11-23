@@ -1,7 +1,7 @@
 <?php
 // Database Connection Information
 $server = "localhost";
-$user = "root";
+$user = "deubaybe.dounia";
 $password = "Dou81387";
 $database = "webtech_2025A_deubaybe.dounia";
 $port = 3306;
