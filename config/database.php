@@ -3,7 +3,7 @@
 $server = "localhost";
 $user = "root";
 $password = "";
-$database = "attendance_system";
+$database = "webtech_2025A_deubaybe.dounia";
 $port = 3306;
 
 // Create a connection

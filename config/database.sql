@@ -1,6 +1,3 @@
--- Create Database
-CREATE DATABASE IF NOT EXISTS attendance_system;
-USE attendance_system;
 
 -- Create Users Table
 CREATE TABLE IF NOT EXISTS users (
