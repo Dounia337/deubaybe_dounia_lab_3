@@ -66,7 +66,7 @@ async function createCourse(event) {
     };
     
     try {
-        const response = await fetch('../actions/create_course.php', {
+        const response = await fetch('..php//create_course.php', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -113,7 +113,7 @@ async function updateCourse(event) {
     };
     
     try {
-        const response = await fetch('../actions/update_course.php', {
+        const response = await fetch('../php/update_course.php', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -154,7 +154,7 @@ async function deleteCourse(event) {
     }
     
     try {
-        const response = await fetch('../actions/delete_course.php', {
+        const response = await fetch('../php/delete_course.php', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -190,7 +190,7 @@ async function loadCourseStats() {
     }
     
     try {
-        const response = await fetch('../actions/get_course_stats.php?course_id=' + courseId);
+        const response = await fetch('../php/get_course_statistics.php?course_id=' + courseId);
         const result = await response.json();
         
         if (result.success) {
