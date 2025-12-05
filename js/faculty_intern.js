@@ -43,7 +43,7 @@ async function activateSession(sessionId) {
     if (!confirm('Activate this session for attendance?')) return;
     
     try {
-        const response = await fetch('../actions/toggle_session.php', {
+        const response = await fetch('../php/toggle_session.php', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -68,7 +68,7 @@ async function deactivateSession(sessionId) {
     if (!confirm('Deactivate this session?')) return;
     
     try {
-        const response = await fetch('../actions/toggle_session.php', {
+        const response = await fetch('../php/toggle_session.php', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
