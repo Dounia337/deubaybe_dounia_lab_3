@@ -12,7 +12,7 @@ document.getElementById('createSessionForm')?.addEventListener('submit', async f
     };
     
     try {
-        const response = await fetch('../actions/create_session.php', {
+        const response = await fetch('../php/create_session.php', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

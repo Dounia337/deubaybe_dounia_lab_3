@@ -66,7 +66,7 @@ async function createCourse(event) {
     };
     
     try {
-        const response = await fetch('..php//create_course.php', {
+        const response = await fetch('../php/create_course.php', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
