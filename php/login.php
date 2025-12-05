@@ -69,6 +69,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <title>Attendance tracker</title> 
 </head>
 <body>
+    
     <div class="singin">  
         <p><h4><span><a href="login.php">Login</a></span> or <span><a href="signup.php">Sign up</a></span>?</h4></p>
     </div>
@@ -89,6 +90,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <script src="../js/login.js">
 </script>
 </html>
+
 <?php 
 $connection->close();
 ?>

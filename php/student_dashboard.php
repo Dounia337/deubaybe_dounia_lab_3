@@ -8,14 +8,13 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'student') {
     exit();
 }
 
-// Fetch student's enrolled courses
-
 $student_id = $_SESSION['user_id'];
+
+// Fetch student's enrolled courses
 $enrolled_courses_query = "SELECT c.* 
                           FROM courses c 
                           JOIN enrollments e ON c.id = e.course_id 
                           WHERE e.student_id = $student_id";
-
 $enrolled_courses_result = $connection->query($enrolled_courses_query);
 
 // Fetch other courses (not enrolled)
@@ -24,18 +23,25 @@ $other_courses_query = "SELECT c.*
                        WHERE c.id NOT IN (
                            SELECT course_id FROM enrollments WHERE student_id = $student_id
                        )";
-
 $other_courses_result = $connection->query($other_courses_query);
 
-// Fetch session schedule
+// Fetch active sessions for enrolled courses
+$active_sessions_query = "SELECT s.*, c.course_name 
+                         FROM sessions s 
+                         JOIN courses c ON s.course_id = c.id 
+                         JOIN enrollments e ON c.id = e.course_id 
+                         WHERE e.student_id = $student_id 
+                         AND s.is_active = TRUE
+                         ORDER BY s.session_date DESC, s.session_time DESC";
+$active_sessions_result = $connection->query($active_sessions_query);
 
+// Fetch session schedule
 $sessions_query = "SELECT s.*, c.course_name 
                    FROM sessions s 
                    JOIN courses c ON s.course_id = c.id 
                    JOIN enrollments e ON c.id = e.course_id 
                    WHERE e.student_id = $student_id
                    ORDER BY s.session_date DESC";
-
 $sessions_result = $connection->query($sessions_query);
 
 // Fetch attendance statistics
@@ -52,13 +58,11 @@ $attendance_stats_query = "SELECT
 $stats_result = $connection->query($attendance_stats_query);
 $stats = $stats_result->fetch_assoc();
 
-// Calculate grade (simple percentage)
+// Calculate grade
 $grade = 0;
 if ($stats['total_sessions'] > 0) {
     $grade = round(($stats['attended'] / $stats['total_sessions']) * 100, 2);
 }
-
-
 ?>
 
 <!DOCTYPE html> 
@@ -87,6 +91,9 @@ if ($stats['total_sessions'] > 0) {
                 <a href="#courses">My Course</a>
             </div>
             <div class="nav">
+                <a href="#attendance">Mark Attendance</a>
+            </div>
+            <div class="nav">
                 <a href="#session">Session Schedule</a>
             </div>
             <div class="nav">
@@ -96,6 +103,45 @@ if ($stats['total_sessions'] > 0) {
                 <a href="#othercourse">Other Courses</a>
             </div>
         </div>
+    </div>
+
+    <!-- Mark Attendance Section -->
+    <div class="list" id="attendance">
+        <div class="list_session">
+            <p><h3>Mark Attendance</h3></p>
+        </div>
+
+        <?php if ($active_sessions_result->num_rows > 0): ?>
+            <?php while($session = $active_sessions_result->fetch_assoc()): ?>
+                <div class="session" style="margin-bottom: 20px;">
+                    <h4 style="color: rgb(187, 41, 41);">Active Session</h4>
+                    <p><strong>Course:</strong> <?php echo $session['course_name']; ?></p>
+                    <p><strong>Date:</strong> <?php echo $session['session_date']; ?></p>
+                    <p><strong>Time:</strong> <?php echo $session['session_time']; ?></p>
+                    <p><strong>Hall:</strong> <?php echo $session['hall']; ?></p>
+                    
+                    <?php
+                    // Check if already marked attendance
+                    $check_attendance = "SELECT * FROM attendance WHERE session_id = {$session['id']} AND student_id = $student_id";
+                    $check_result = $connection->query($check_attendance);
+                    
+                    if ($check_result->num_rows > 0):
+                        $att = $check_result->fetch_assoc();
+                    ?>
+                        <p style="color: green;"><strong>✓ Attendance already marked as: <?php echo ucfirst($att['status']); ?></strong></p>
+                    <?php else: ?>
+                        <form onsubmit="markAttendance(event, <?php echo $session['id']; ?>)" style="margin-top: 15px;">
+                            <label><strong>Enter 4-Digit PIN:</strong></label>
+                            <input type="text" id="pin_<?php echo $session['id']; ?>" pattern="[0-9]{4}" maxlength="4" placeholder="1234" required style="padding: 8px; margin: 10px 0;">
+                            <button type="submit" style="padding: 10px 20px;">Record Attendance</button>
+                        </form>
+                        <div id="message_<?php echo $session['id']; ?>" style="margin-top: 10px;"></div>
+                    <?php endif; ?>
+                </div>
+            <?php endwhile; ?>
+        <?php else: ?>
+            <p>No active sessions available for attendance.</p>
+        <?php endif; ?>
     </div>
        
     <div class="list"> 
@@ -125,12 +171,6 @@ if ($stats['total_sessions'] > 0) {
         </div>
         
         <?php if ($sessions_result->num_rows > 0): ?>
-        <div class="session"> 
-            <h4 style="color: rgb(187, 41, 41);">Attendance Session</h4> 
-            <p>Course: Various</p>
-            <p>Date: Various</p>
-        </div>
-
         <div> 
             <table>
                 <tr>
@@ -138,6 +178,7 @@ if ($stats['total_sessions'] > 0) {
                     <th style="color: rgb(172, 80, 80);">Time</th>
                     <th style="color: rgb(172, 80, 80);">Course</th>
                     <th style="color: rgb(172, 80, 80);">Hall</th>
+                    <th style="color: rgb(172, 80, 80);">Status</th>
                 </tr>
                 <?php while($session = $sessions_result->fetch_assoc()): ?>
                 <tr>
@@ -145,6 +186,7 @@ if ($stats['total_sessions'] > 0) {
                     <td><?php echo $session['session_time']; ?></td>
                     <td><?php echo $session['course_name']; ?></td>
                     <td><?php echo $session['hall']; ?></td>
+                    <td><?php echo $session['is_active'] ? '<span style="color: green;">Active</span>' : 'Closed'; ?></td>
                 </tr>
                 <?php endwhile; ?>
             </table>
@@ -193,14 +235,9 @@ if ($stats['total_sessions'] > 0) {
                 <p>No other courses available.</p>
             <?php endif; ?>
         </div> 
-        
-        <div class="list_session" id="view"> 
-            <p><h3>View Feedbacks</h3></p>
-        </div> 
     </div>
 
-    <script src="../js/student.js"> >
-    </script>
+    <script src="../js/student.js"></script>
 </body>
 </html>
 <?php 
