@@ -3,7 +3,7 @@ async function joinCourse(courseId) {
     if (!confirm('Do you want to enroll in this course?')) return;
     
     try {
-        const response = await fetch('../actions/enroll_student.php', {
+        const response = await fetch('../php/enroll_student.php', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'
@@ -38,7 +38,7 @@ async function markAttendance(event, sessionId) {
     }
     
     try {
-        const response = await fetch('../actions/mark_attendance.php', {
+        const response = await fetch('../php/mark_attendance.php', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
