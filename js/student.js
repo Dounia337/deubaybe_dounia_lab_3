@@ -3,7 +3,7 @@ async function joinCourse(courseId) {
     if (!confirm('Do you want to enroll in this course?')) return;
     
     try {
-        const response = await fetch('../php/enroll_student.php', {
+        const response = await fetch('../php/enroll_course.php', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'
