@@ -34,12 +34,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_SESSION['user_id']) && $_SE
         exit();
     }
     
-    // Check if student is enrolled in the course
-    $enrollment_check = "SELECT * FROM enrollments WHERE student_id = $student_id AND course_id = {$session['course_id']}";
+    // Check if student is enrolled in the course and approved
+    $enrollment_check = "SELECT * FROM enrollments WHERE student_id = $student_id AND course_id = {$session['course_id']} AND status = 'approved'";
     $enrollment_result = $connection->query($enrollment_check);
     
     if ($enrollment_result->num_rows === 0) {
-        echo json_encode(['success' => false, 'message' => 'You are not enrolled in this course']);
+        echo json_encode(['success' => false, 'message' => 'You are not enrolled in this course or enrollment is pending approval']);
         exit();
     }
     

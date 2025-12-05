@@ -10,14 +10,21 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'student') {
 
 $student_id = $_SESSION['user_id'];
 
-// Fetch student's enrolled courses
+// Fetch student's enrolled courses (approved only)
 $enrolled_courses_query = "SELECT c.* 
                           FROM courses c 
                           JOIN enrollments e ON c.id = e.course_id 
-                          WHERE e.student_id = $student_id";
+                          WHERE e.student_id = $student_id AND e.status = 'approved'";
 $enrolled_courses_result = $connection->query($enrolled_courses_query);
 
-// Fetch other courses (not enrolled)
+// Fetch pending enrollments
+$pending_courses_query = "SELECT c.course_name, c.semester, c.cohort, e.enrolled_at
+                         FROM courses c
+                         JOIN enrollments e ON c.id = e.course_id
+                         WHERE e.student_id = $student_id AND e.status = 'pending'";
+$pending_courses_result = $connection->query($pending_courses_query);
+
+// Fetch other courses (not enrolled or pending)
 $other_courses_query = "SELECT c.* 
                        FROM courses c 
                        WHERE c.id NOT IN (
@@ -25,12 +32,13 @@ $other_courses_query = "SELECT c.*
                        )";
 $other_courses_result = $connection->query($other_courses_query);
 
-// Fetch active sessions for enrolled courses
+// Fetch active sessions for enrolled courses (approved only)
 $active_sessions_query = "SELECT s.*, c.course_name 
                          FROM sessions s 
                          JOIN courses c ON s.course_id = c.id 
                          JOIN enrollments e ON c.id = e.course_id 
                          WHERE e.student_id = $student_id 
+                         AND e.status = 'approved'
                          AND s.is_active = TRUE
                          ORDER BY s.session_date DESC, s.session_time DESC";
 $active_sessions_result = $connection->query($active_sessions_query);
@@ -41,6 +49,7 @@ $sessions_query = "SELECT s.*, c.course_name
                    JOIN courses c ON s.course_id = c.id 
                    JOIN enrollments e ON c.id = e.course_id 
                    WHERE e.student_id = $student_id
+                   AND e.status = 'approved'
                    ORDER BY s.session_date DESC";
 $sessions_result = $connection->query($sessions_query);
 
@@ -53,7 +62,7 @@ $attendance_stats_query = "SELECT
     JOIN courses c ON s.course_id = c.id
     JOIN enrollments e ON c.id = e.course_id
     LEFT JOIN attendance a ON s.id = a.session_id AND a.student_id = $student_id
-    WHERE e.student_id = $student_id";
+    WHERE e.student_id = $student_id AND e.status = 'approved'";
     
 $stats_result = $connection->query($attendance_stats_query);
 $stats = $stats_result->fetch_assoc();
@@ -162,7 +171,25 @@ if ($stats['total_sessions'] > 0) {
             <?php else: ?>
                 <p>No courses enrolled yet.</p>
             <?php endif; ?>
-        </div>  
+        </div>
+
+        <!-- Pending Enrollments -->
+        <?php if ($pending_courses_result->num_rows > 0): ?>
+        <div style="margin-top: 30px;">
+            <h4 style="color: orange;">⏳ Pending Course Approvals</h4>
+            <div class="cards">
+                <?php while($course = $pending_courses_result->fetch_assoc()): ?>
+                <div class="card" style="opacity: 0.6; border: 2px dashed orange;">
+                    <img src="../images/icon1.png" style="width:40px; height:40px;">
+                    <h4><?php echo $course['course_name']; ?></h4>
+                    <p><h4><?php echo $course['semester']; ?></h4></p>
+                    <p><h5><?php echo $course['cohort']; ?></h5></p>
+                    <p style="color: orange;"><small>Awaiting approval</small></p>
+                </div>
+                <?php endwhile; ?>
+            </div>
+        </div>
+        <?php endif; ?>
     </div>
 
     <div class="list"> 
@@ -228,7 +255,7 @@ if ($stats['total_sessions'] > 0) {
                     <h4><?php echo $course['course_name']; ?></h4>
                     <p><h4><?php echo $course['semester']; ?></h4></p>
                     <p><h5><?php echo $course['cohort']; ?></h5></p>
-                    <button onclick="joinCourse(<?php echo $course['id']; ?>)">Join</button>
+                    <button onclick="joinCourse(<?php echo $course['id']; ?>)">Request to Join</button>
                 </div>
                 <?php endwhile; ?>
             <?php else: ?>

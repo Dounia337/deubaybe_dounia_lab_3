@@ -87,3 +87,96 @@ async function deactivateSession(sessionId) {
         alert('Error deactivating session');
     }
 }
+
+// Approve Enrollment
+async function approveEnrollment(enrollmentId) {
+    try {
+        const response = await fetch('../php/manage_enrollment.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ enrollment_id: enrollmentId, action: 'approve' })
+        });
+        
+        const result = await response.json();
+        if (result.success) {
+            alert(result.message);
+            location.reload();
+        } else {
+            alert('Error: ' + result.message);
+        }
+    } catch (error) {
+        alert('Error approving enrollment');
+    }
+}
+
+// Reject Enrollment
+async function rejectEnrollment(enrollmentId) {
+    if (!confirm('Reject this enrollment request?')) return;
+    
+    try {
+        const response = await fetch('../php/manage_enrollment.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ enrollment_id: enrollmentId, action: 'reject' })
+        });
+        
+        const result = await response.json();
+        if (result.success) {
+            alert(result.message);
+            location.reload();
+        } else {
+            alert('Error: ' + result.message);
+        }
+    } catch (error) {
+        alert('Error rejecting enrollment');
+    }
+}
+
+// Load Course Report
+async function loadCourseReport() {
+    const courseId = document.getElementById('report_course_id').value;
+    const reportContent = document.getElementById('reportContent');
+    
+    if (!courseId) {
+        reportContent.innerHTML = '<p>Please select a course to view reports.</p>';
+        return;
+    }
+    
+    try {
+        const response = await fetch('../php/get_course_statistics.php?course_id=' + courseId);
+        const result = await response.json();
+        
+        if (result.success) {
+            const data = result.data;
+            reportContent.innerHTML = `
+                <div>
+                    <p><h4>Attendance Reports</h4></p>
+                    <table>
+                        <tr>
+                            <th style="color: rgb(172, 80, 80);">Total Sessions</th>
+                            <th style="color: rgb(172, 80, 80);">Total Students</th>
+                            <th style="color: rgb(172, 80, 80);">Present</th>
+                            <th style="color: rgb(172, 80, 80);">Late</th>
+                            <th style="color: rgb(172, 80, 80);">Avg Attendance</th>
+                        </tr>
+                        <tr>
+                            <td>${data.total_sessions}</td>
+                            <td>${data.total_students}</td>
+                            <td>${data.present_count}</td>
+                            <td>${data.late_count}</td>
+                            <td>${data.avg_attendance}%</td>
+                        </tr>
+                    </table>
+                </div>
+            `;
+        } else {
+            reportContent.innerHTML = '<p style="color: red;">' + result.message + '</p>';
+        }
+    } catch (error) {
+        reportContent.innerHTML = '<p style="color: red;">Error loading report</p>';
+    }
+}

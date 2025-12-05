@@ -8,11 +8,24 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'fI') {
     exit();
 }
 
-// Fetch all courses
+// Fetch only courses where FI is assigned
+$fi_id = $_SESSION['user_id'];
 $courses_query = "SELECT c.*, u.first_name, u.last_name 
                   FROM courses c 
-                  JOIN users u ON c.created_by = u.id";
+                  JOIN users u ON c.created_by = u.id
+                  JOIN course_assistants ca ON c.id = ca.course_id
+                  WHERE ca.assistant_id = $fi_id";
 $courses_result = $connection->query($courses_query);
+
+// Fetch pending enrollments for FI's courses
+$pending_enrollments_query = "SELECT e.*, u.first_name, u.last_name, u.email, c.course_name
+                               FROM enrollments e
+                               JOIN users u ON e.student_id = u.id
+                               JOIN courses c ON e.course_id = c.id
+                               JOIN course_assistants ca ON c.id = ca.course_id
+                               WHERE e.status = 'pending' AND ca.assistant_id = $fi_id
+                               ORDER BY e.enrolled_at DESC";
+$pending_enrollments_result = $connection->query($pending_enrollments_query);
 
 // Fetch latest session
 $sessions_query = "SELECT s.*, c.course_name 
