@@ -13,6 +13,19 @@ $teacher_id = $_SESSION['user_id'];
 $courses_query = "SELECT * FROM courses WHERE created_by = $teacher_id";
 $courses_result = $connection->query($courses_query);
 
+// Fetch pending enrollments for teacher's courses
+$pending_enrollments_query = "SELECT e.*, u.first_name, u.last_name, u.email, c.course_name
+                               FROM enrollments e
+                               JOIN users u ON e.student_id = u.id
+                               JOIN courses c ON e.course_id = c.id
+                               WHERE e.status = 'pending' AND c.created_by = $teacher_id
+                               ORDER BY e.enrolled_at DESC";
+$pending_enrollments_result = $connection->query($pending_enrollments_query);
+
+// Fetch all Faculty Interns
+$fi_query = "SELECT id, first_name, last_name, email FROM users WHERE role = 'fI'";
+$fi_result = $connection->query($fi_query);
+
 // Fetch latest session
 $session_query = "SELECT s.*, c.course_name 
                  FROM sessions s 
@@ -34,24 +47,6 @@ if ($current_session) {
     while ($row = $attendance_result->fetch_assoc()) {
         $attendance_data[] = $row;
     }
-}
-
-// Calculate stats
-$stats = [];
-$stats['total_students'] = 0;
-$stats['present'] = 0;
-$stats['absent'] = 0;
-$stats['late'] = 0;
-
-if ($current_session) {
-    $stats_query = "SELECT 
-        COUNT(DISTINCT student_id) as total_students,
-        SUM(CASE WHEN status = 'present' THEN 1 ELSE 0 END) as present,
-        SUM(CASE WHEN status = 'absent' THEN 1 ELSE 0 END) as absent,
-        SUM(CASE WHEN status = 'late' THEN 1 ELSE 0 END) as late
-        FROM attendance WHERE session_id = $session_id";
-    $stats_result = $connection->query($stats_query);
-    $stats = $stats_result->fetch_assoc();
 }
 ?>
 
@@ -81,10 +76,22 @@ if ($current_session) {
                 <a href="#courses">Course Management</a>
             </div>
             <div class="nav">
+                <a href="#assistants">Manage FI</a>
+            </div>
+            <div class="nav">
+                <a href="#enrollments">Pending Enrollments 
+                    <?php if ($pending_enrollments_result->num_rows > 0): ?>
+                        <span style="background: red; color: white; padding: 2px 6px; border-radius: 10px; font-size: 12px;">
+                            <?php echo $pending_enrollments_result->num_rows; ?>
+                        </span>
+                    <?php endif; ?>
+                </a>
+            </div>
+            <div class="nav">
                 <a href="#session">Session Overview</a>
             </div>
             <div class="nav">
-                <a href="#report">Attendance Reports</a>
+                <a href="#report">Reports</a>
             </div>
         </div>
     </div>
@@ -93,24 +100,29 @@ if ($current_session) {
         <p><h3>Course Management</h3></p>
 
         <div class="cards"> 
-            <div class="card" onclick="showCreateCourseForm()">
-                <img src="../images/create.png" style="width:40px; height:40px;">
+            <div class="card" onclick="showCreateCourseForm()" style="cursor: pointer;">
+                <img src="../images/create.png" style="width:40px; height:40px;" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2240%22 height=%2240%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23bb2929%22 stroke-width=%222%22%3E%3Cpath d=%22M12 5v14M5 12h14%22/%3E%3C/svg%3E';">
                 <h4>Create Course</h4>
             </div>
 
-            <div class="card" onclick="showEditCourseForm()">
-                <img src="../images/edit.png" style="width:40px; height:40px;">
+            <div class="card" onclick="showEditCourseForm()" style="cursor: pointer;">
+                <img src="../images/edit.png" style="width:40px; height:40px;" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2240%22 height=%2240%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23bb2929%22 stroke-width=%222%22%3E%3Cpath d=%22M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7%22/%3E%3Cpath d=%22M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z%22/%3E%3C/svg%3E';">
                 <h4>Edit Course</h4>
             </div>
 
-            <div class="card" onclick="showDeleteCourseForm()">
-                <img src="../images/trash.png" style="width:40px; height:40px;">
+            <div class="card" onclick="showDeleteCourseForm()" style="cursor: pointer;">
+                <img src="../images/trash.png" style="width:40px; height:40px;" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2240%22 height=%2240%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23bb2929%22 stroke-width=%222%22%3E%3Cpolyline points=%223 6 5 6 21 6%22/%3E%3Cpath d=%22M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2%22/%3E%3C/svg%3E';">
                 <h4>Delete Course</h4>
             </div>
 
-            <div class="card" onclick="viewStatistics()">
-                <img src="../images/view.png" style="width:40px; height:40px;">
+            <div class="card" onclick="viewStatistics()" style="cursor: pointer;">
+                <img src="../images/view.png" style="width:40px; height:40px;" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2240%22 height=%2240%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23bb2929%22 stroke-width=%222%22%3E%3Cpath d=%22M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z%22/%3E%3Ccircle cx=%2212%22 cy=%2212%22 r=%223%22/%3E%3C/svg%3E';">
                 <h4>View Statistics</h4>
+            </div>
+
+            <div class="card" onclick="showManageFISection()" style="cursor: pointer; background-color: #e3d1cb;">
+                <img src="../images/user.png" style="width:40px; height:40px;" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2240%22 height=%2240%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23bb2929%22 stroke-width=%222%22%3E%3Cpath d=%22M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2%22/%3E%3Ccircle cx=%229%22 cy=%227%22 r=%224%22/%3E%3Cpath d=%22M23 21v-2a4 4 0 0 0-3-3.87%22/%3E%3Cpath d=%22M16 3.13a4 4 0 0 1 0 7.75%22/%3E%3C/svg%3E';">
+                <h4>Manage FI</h4>
             </div>
         </div>  
 
@@ -185,7 +197,7 @@ if ($current_session) {
                     <?php endwhile; ?>
                 </select><br><br>
                 
-                <p style="color: red;"><strong>Warning: This will delete the course and all associated sessions and attendance records!</strong></p>
+                <p style="color: red;"><strong>Warning: This will delete the course and all associated data!</strong></p>
                 
                 <button type="submit" style="background-color: #d32f2f;">Delete Course</button>
                 <button type="button" onclick="hideDeleteCourseForm()">Cancel</button>
@@ -234,6 +246,84 @@ if ($current_session) {
         </div>
     </div>
 
+    <!-- Manage Faculty Interns Section -->
+    <div class="list" id="assistants">
+        <div id="manageFISection" style="display: none;">
+            <p><h3>Manage Faculty Interns</h3></p>
+            
+            <div style="margin-top: 20px; padding: 20px; background: #f9f9f9; border-radius: 10px; max-width: 600px;">
+                <h4>Assign Faculty Intern to Course</h4>
+                <form onsubmit="assignFI(event)">
+                    <label>Select Course:</label>
+                    <select id="assign_course_id" required>
+                        <option value="">-- Select Course --</option>
+                        <?php 
+                        $courses_result->data_seek(0);
+                        while($course = $courses_result->fetch_assoc()): 
+                        ?>
+                            <option value="<?php echo $course['id']; ?>">
+                                <?php echo $course['course_name']; ?>
+                            </option>
+                        <?php endwhile; ?>
+                    </select><br><br>
+                    
+                    <label>Select Faculty Intern:</label>
+                    <select id="assign_fi_id" required>
+                        <option value="">-- Select FI --</option>
+                        <?php while($fi = $fi_result->fetch_assoc()): ?>
+                            <option value="<?php echo $fi['id']; ?>">
+                                <?php echo $fi['first_name'] . ' ' . $fi['last_name'] . ' (' . $fi['email'] . ')'; ?>
+                            </option>
+                        <?php endwhile; ?>
+                    </select><br><br>
+                    
+                    <button type="submit">Assign FI</button>
+                </form>
+                <div id="assignMessage"></div>
+            </div>
+
+            <!-- View Current Assignments -->
+            <div style="margin-top: 30px;">
+                <h4>Current FI Assignments</h4>
+                <div id="fiAssignmentsList"></div>
+                <button onclick="loadFIAssignments()">Refresh Assignments</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pending Enrollments Section -->
+    <div class="list" id="enrollments">
+        <p><h3>Pending Enrollments</h3></p>
+        
+        <?php if ($pending_enrollments_result->num_rows > 0): ?>
+        <div>
+            <table>
+                <tr>
+                    <th style="color: rgb(172, 80, 80);">Student Name</th>
+                    <th style="color: rgb(172, 80, 80);">Email</th>
+                    <th style="color: rgb(172, 80, 80);">Course</th>
+                    <th style="color: rgb(172, 80, 80);">Requested</th>
+                    <th style="color: rgb(172, 80, 80);">Actions</th>
+                </tr>
+                <?php while($enrollment = $pending_enrollments_result->fetch_assoc()): ?>
+                <tr>
+                    <td><?php echo $enrollment['first_name'] . ' ' . $enrollment['last_name']; ?></td>
+                    <td><?php echo $enrollment['email']; ?></td>
+                    <td><?php echo $enrollment['course_name']; ?></td>
+                    <td><?php echo date('M d, Y', strtotime($enrollment['enrolled_at'])); ?></td>
+                    <td>
+                        <button onclick="approveEnrollment(<?php echo $enrollment['id']; ?>)" style="background: green; margin-right: 5px;">Approve</button>
+                        <button onclick="rejectEnrollment(<?php echo $enrollment['id']; ?>)" style="background: red;">Reject</button>
+                    </td>
+                </tr>
+                <?php endwhile; ?>
+            </table>
+        </div>
+        <?php else: ?>
+        <p>No pending enrollment requests.</p>
+        <?php endif; ?>
+    </div>
+
     <div class="list" id="session"> 
         <p><h3>Sessions</h3></p>
 
@@ -271,11 +361,11 @@ if ($current_session) {
         </div>
 
         <?php 
-        // Fetch list of enrolled students who haven't marked attendance
         $enrolled_students_query = "SELECT u.id, u.first_name, u.last_name 
                                     FROM users u
                                     JOIN enrollments e ON u.id = e.student_id
                                     WHERE e.course_id = {$current_session['course_id']}
+                                    AND e.status = 'approved'
                                     AND u.id NOT IN (
                                         SELECT student_id FROM attendance WHERE session_id = {$current_session['id']}
                                     )
@@ -283,7 +373,7 @@ if ($current_session) {
         $absent_students_result = $connection->query($enrolled_students_query);
         ?>
 
-        <h4 style="margin-top: 30px; color: rgb(187, 41, 41);">Students Absent (Not Yet Marked)</h4>
+        <h4 style="margin-top: 30px; color: rgb(187, 41, 41);">Students Absent</h4>
         <div> 
             <table>
                 <tr>
@@ -313,26 +403,30 @@ if ($current_session) {
 
     <div class="list" id="report"> 
         <p><h3>Reports</h3></p>
-        <div>
-            <p><h4>Attendance Reports</h4></p>
-            <table>
-                <tr>
-                    <th style="color: rgb(172, 80, 80);">Total Students</th>
-                    <th style="color: rgb(172, 80, 80);">Present</th>
-                    <th style="color: rgb(172, 80, 80);">Absent</th>
-                    <th style="color: rgb(172, 80, 80);">Late</th>
-                </tr>
-                <tr>
-                    <td><?php echo $stats['total_students']; ?></td>
-                    <td><?php echo $stats['present']; ?></td>
-                    <td><?php echo $stats['absent']; ?></td>
-                    <td><?php echo $stats['late']; ?></td>
-                </tr>
-            </table>
+        <div style="margin-bottom: 20px;">
+            <label><strong>Select Course:</strong></label>
+            <select id="report_course_id" onchange="loadCourseReport()">
+                <option value="">-- Select Course --</option>
+                <?php 
+                $courses_result->data_seek(0);
+                while($course = $courses_result->fetch_assoc()): 
+                ?>
+                    <option value="<?php echo $course['id']; ?>">
+                        <?php echo $course['course_name']; ?>
+                    </option>
+                <?php endwhile; ?>
+            </select>
+        </div>
+        <div id="reportContent">
+            <p>Please select a course to view reports.</p>
         </div>
     </div>
 
     <script src="../js/teacher.js"></script>
+    <script>
+        // Load FI assignments on page load
+        window.addEventListener('load', loadFIAssignments);
+    </script>
 </body>
 </html>
 <?php $connection->close(); ?>
