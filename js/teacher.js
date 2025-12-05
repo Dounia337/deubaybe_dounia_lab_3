@@ -4,6 +4,7 @@ function showCreateCourseForm() {
     document.getElementById('editCourseForm').style.display = 'none';
     document.getElementById('deleteCourseForm').style.display = 'none';
     document.getElementById('statisticsView').style.display = 'none';
+    hideManageFISection();
 }
 
 function hideCreateCourseForm() {
@@ -15,6 +16,7 @@ function showEditCourseForm() {
     document.getElementById('createCourseForm').style.display = 'none';
     document.getElementById('deleteCourseForm').style.display = 'none';
     document.getElementById('statisticsView').style.display = 'none';
+    hideManageFISection();
 }
 
 function hideEditCourseForm() {
@@ -26,6 +28,7 @@ function showDeleteCourseForm() {
     document.getElementById('createCourseForm').style.display = 'none';
     document.getElementById('editCourseForm').style.display = 'none';
     document.getElementById('statisticsView').style.display = 'none';
+    hideManageFISection();
 }
 
 function hideDeleteCourseForm() {
@@ -37,10 +40,32 @@ function viewStatistics() {
     document.getElementById('createCourseForm').style.display = 'none';
     document.getElementById('editCourseForm').style.display = 'none';
     document.getElementById('deleteCourseForm').style.display = 'none';
+    hideManageFISection();
 }
 
 function hideStatistics() {
     document.getElementById('statisticsView').style.display = 'none';
+}
+
+function showManageFISection() {
+    const fiSection = document.getElementById('manageFISection');
+    if (fiSection) {
+        fiSection.style.display = 'block';
+    }
+    document.getElementById('createCourseForm').style.display = 'none';
+    document.getElementById('editCourseForm').style.display = 'none';
+    document.getElementById('deleteCourseForm').style.display = 'none';
+    document.getElementById('statisticsView').style.display = 'none';
+    
+    // Scroll to the section
+    document.getElementById('assistants').scrollIntoView({ behavior: 'smooth' });
+}
+
+function hideManageFISection() {
+    const fiSection = document.getElementById('manageFISection');
+    if (fiSection) {
+        fiSection.style.display = 'none';
+    }
 }
 
 // Load course data for editing
@@ -190,7 +215,7 @@ async function loadCourseStats() {
     }
     
     try {
-        const response = await fetch('../php/get_course_statistics.php?course_id=' + courseId);
+        const response = await fetch('../php/get_course_stats.php?course_id=' + courseId);
         const result = await response.json();
         
         if (result.success) {
