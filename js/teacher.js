@@ -219,3 +219,186 @@ async function loadCourseStats() {
         statsContent.innerHTML = '<p style="color: red;">Error loading statistics</p>';
     }
 }
+
+// Assign Faculty Intern
+async function assignFI(event) {
+    event.preventDefault();
+    
+    const courseId = document.getElementById('assign_course_id').value;
+    const fiId = document.getElementById('assign_fi_id').value;
+    
+    try {
+        const response = await fetch('../php/assign_fi.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ course_id: courseId, fi_id: fiId })
+        });
+        
+        const result = await response.json();
+        const messageDiv = document.getElementById('assignMessage');
+        
+        if (result.success) {
+            messageDiv.style.color = 'green';
+            messageDiv.textContent = result.message;
+            document.getElementById('assign_course_id').value = '';
+            document.getElementById('assign_fi_id').value = '';
+            setTimeout(() => loadFIAssignments(), 1000);
+        } else {
+            messageDiv.style.color = 'red';
+            messageDiv.textContent = result.message;
+        }
+    } catch (error) {
+        document.getElementById('assignMessage').textContent = 'Error assigning FI';
+        document.getElementById('assignMessage').style.color = 'red';
+    }
+}
+
+// Load FI Assignments
+async function loadFIAssignments() {
+    try {
+        const response = await fetch('../php/get_fi_assignments.php');
+        const result = await response.json();
+        
+        const listDiv = document.getElementById('fiAssignmentsList');
+        
+        if (result.success && result.data.length > 0) {
+            let html = '<table style="width: 100%; margin-top: 10px;"><tr><th>Course</th><th>Faculty Intern</th><th>Assigned Date</th><th>Action</th></tr>';
+            result.data.forEach(assignment => {
+                html += `
+                    <tr>
+                        <td>${assignment.course_name}</td>
+                        <td>${assignment.fi_name}</td>
+                        <td>${assignment.assigned_at}</td>
+                        <td><button onclick="removeFI(${assignment.id})" style="background: red;">Remove</button></td>
+                    </tr>
+                `;
+            });
+            html += '</table>';
+            listDiv.innerHTML = html;
+        } else {
+            listDiv.innerHTML = '<p>No FI assignments yet.</p>';
+        }
+    } catch (error) {
+        document.getElementById('fiAssignmentsList').innerHTML = '<p style="color: red;">Error loading assignments</p>';
+    }
+}
+
+// Remove FI Assignment
+async function removeFI(assignmentId) {
+    if (!confirm('Remove this FI from the course?')) return;
+    
+    try {
+        const response = await fetch('../php/remove_fi.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ assignment_id: assignmentId })
+        });
+        
+        const result = await response.json();
+        if (result.success) {
+            alert(result.message);
+            loadFIAssignments();
+        } else {
+            alert('Error: ' + result.message);
+        }
+    } catch (error) {
+        alert('Error removing FI');
+    }
+}
+
+// Approve Enrollment
+async function approveEnrollment(enrollmentId) {
+    try {
+        const response = await fetch('../php/manage_enrollment.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ enrollment_id: enrollmentId, action: 'approve' })
+        });
+        
+        const result = await response.json();
+        if (result.success) {
+            alert(result.message);
+            location.reload();
+        } else {
+            alert('Error: ' + result.message);
+        }
+    } catch (error) {
+        alert('Error approving enrollment');
+    }
+}
+
+// Reject Enrollment
+async function rejectEnrollment(enrollmentId) {
+    if (!confirm('Reject this enrollment request?')) return;
+    
+    try {
+        const response = await fetch('../php/manage_enrollment.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ enrollment_id: enrollmentId, action: 'reject' })
+        });
+        
+        const result = await response.json();
+        if (result.success) {
+            alert(result.message);
+            location.reload();
+        } else {
+            alert('Error: ' + result.message);
+        }
+    } catch (error) {
+        alert('Error rejecting enrollment');
+    }
+}
+
+// Load Course Report
+async function loadCourseReport() {
+    const courseId = document.getElementById('report_course_id').value;
+    const reportContent = document.getElementById('reportContent');
+    
+    if (!courseId) {
+        reportContent.innerHTML = '<p>Please select a course to view reports.</p>';
+        return;
+    }
+    
+    try {
+        const response = await fetch('../php/get_course_statistics.php?course_id=' + courseId);
+        const result = await response.json();
+        
+        if (result.success) {
+            const data = result.data;
+            reportContent.innerHTML = `
+                <div>
+                    <p><h4>Attendance Reports</h4></p>
+                    <table>
+                        <tr>
+                            <th style="color: rgb(172, 80, 80);">Total Sessions</th>
+                            <th style="color: rgb(172, 80, 80);">Total Students</th>
+                            <th style="color: rgb(172, 80, 80);">Present</th>
+                            <th style="color: rgb(172, 80, 80);">Late</th>
+                            <th style="color: rgb(172, 80, 80);">Avg Attendance</th>
+                        </tr>
+                        <tr>
+                            <td>${data.total_sessions}</td>
+                            <td>${data.total_students}</td>
+                            <td>${data.present_count}</td>
+                            <td>${data.late_count}</td>
+                            <td>${data.avg_attendance}%</td>
+                        </tr>
+                    </table>
+                </div>
+            `;
+        } else {
+            reportContent.innerHTML = '<p style="color: red;">' + result.message + '</p>';
+        }
+    } catch (error) {
+        reportContent.innerHTML = '<p style="color: red;">Error loading report</p>';
+    }
+}

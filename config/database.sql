@@ -58,3 +58,31 @@ CREATE TABLE IF NOT EXISTS attendance (
     FOREIGN KEY (marked_by) REFERENCES users(id),
     UNIQUE KEY unique_attendance (session_id, student_id)
 );
+
+
+
+
+
+
+-- Add course_assistants table to track Faculty Interns assigned to courses
+CREATE TABLE IF NOT EXISTS course_assistants (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    course_id INT NOT NULL,
+    assistant_id INT NOT NULL,
+    assigned_by INT NOT NULL,
+    assigned_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE,
+    FOREIGN KEY (assistant_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (assigned_by) REFERENCES users(id),
+    UNIQUE KEY unique_assistant (course_id, assistant_id)
+);
+
+-- Add status column to enrollments table for pending/approved
+ALTER TABLE enrollments 
+ADD COLUMN status ENUM('pending', 'approved', 'rejected') DEFAULT 'pending',
+ADD COLUMN approved_by INT DEFAULT NULL,
+ADD COLUMN approved_at TIMESTAMP NULL,
+ADD FOREIGN KEY (approved_by) REFERENCES users(id);
+
+-- Update existing enrollments to approved status
+UPDATE enrollments SET status = 'approved' WHERE status = 'pending';
