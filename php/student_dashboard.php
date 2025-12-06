@@ -174,6 +174,7 @@ if ($stats['total_sessions'] > 0) {
         </div>
 
         <!-- Pending Enrollments -->
+         
         <?php if ($pending_courses_result->num_rows > 0): ?>
         <div style="margin-top: 30px;">
             <h4 style="color: orange;">⏳ Pending Course Approvals</h4>
