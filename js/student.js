@@ -3,7 +3,7 @@ async function joinCourse(courseId) {
     if (!confirm('Request to join this course? You will need approval from faculty.')) return;
     
     try {
-        const response = await fetch('../php/enroll_student.php', {
+        const response = await fetch('../php/enroll_course.php', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'
